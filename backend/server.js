@@ -5,7 +5,7 @@ import { GoogleAIFileManager } from "@google/generative-ai/server";
 import dotenv from "dotenv";
 import multer from "multer";
 import fs from "fs";
-import pdfParse from "pdf-parse";
+import pdfParse from "pdf-parse/lib/pdf-parse.js";
 
 dotenv.config({ path: '../.env' });
 
@@ -13,7 +13,7 @@ const upload = multer({ dest: 'uploads/' });
 
 const app = express();
 app.use(cors({
-    origin: '*',
+    origin: ['https://physics-ai-app.vercel.app', 'http://localhost:5173'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
 }));
