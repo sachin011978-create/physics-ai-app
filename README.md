@@ -29,16 +29,16 @@ git push -u origin main
    - Value: `<Your Google Gemini Key>`
 5. Click **Deploy** and **copy your newly generated Backend URL** (e.g., `https://physics-backend.onrender.com`).
 
-### Step 3: Deploy Frontend to Vercel
-1. Log into [Vercel](https://vercel.com).
-2. Create a **New Project** and import the exact same GitHub repository.
-3. Keep the configuration defaults:
-   - **Framework Preset**: Vite (Auto-detects)
-   - **Root Directory**: `./` (Default)
-4. Add Environment Variables:
+### Step 3: Deploy Frontend to Netlify
+1. Log into [Netlify](https://netlify.com).
+2. Click **Add new site** -> **Import an existing project** from GitHub.
+3. Keep the configuration exact defaults:
+   - **Build Command**: `npm run build`
+   - **Publish directory**: `dist`
+4. Click **Show advanced** to Add Environment Variables:
    - Key: `VITE_API_URL`
    - Value: `<Paste the Backend URL you copied from Step 2>` *(e.g., `https://physics-backend.onrender.com`)*
-5. Click **Deploy**. Vercel will inherently run `npm run build` and follow the `vercel.json` routing rules safely!
+5. Click **Deploy Site**. Netlify will build your SPA and flawlessly route physics queries mapping strictly to the `netlify.toml` settings!
 
 ## 🎉 Final Run
-Once the backend boots successfully on Render and Vercel completes the React build, everything will snap into place securely via standard global CORS protocols. Happy studying!
+Once the backend boots successfully on Render and Netlify completes the React build, everything will snap into place securely via standard global CORS protocols. Happy studying!
