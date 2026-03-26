@@ -5,7 +5,9 @@ import { GoogleAIFileManager } from "@google/generative-ai/server";
 import dotenv from "dotenv";
 import multer from "multer";
 import fs from "fs";
-import pdfParse from "pdf-parse";
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+const pdfParse = require("pdf-parse");
 
 dotenv.config({ path: '../.env' });
 
