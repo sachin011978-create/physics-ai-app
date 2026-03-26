@@ -7,7 +7,8 @@ import multer from "multer";
 import fs from "fs";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
-const pdfParse = require("pdf-parse");
+const _pdfParse = require("pdf-parse");
+const pdfParse = _pdfParse.default || _pdfParse;
 
 dotenv.config({ path: '../.env' });
 
