@@ -15,7 +15,8 @@ dotenv.config({ path: '../.env' });
 const upload = multer({ dest: 'uploads/' });
 
 const app = express();
-app.use(cors());
+app.use(cors({ origin: '*' }));
+app.get('/health', (req, res) => res.send('OK'));
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
@@ -73,7 +74,7 @@ app.post("/upload", upload.single("file"), async (req, res) => {
         // Return local URL to serve PDF in iframe
         res.json({ 
             fileUri: uploadResponse.file.uri, 
-            localUrl: `http://localhost:3000/uploads/${req.file.filename}.pdf`
+            localUrl: `https://physics-backend.onrender.com/uploads/${req.file.filename}.pdf`
         });
     } catch (error) {
         console.error("Upload Error:", error);

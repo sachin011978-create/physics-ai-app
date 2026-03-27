@@ -147,7 +147,7 @@ function App() {
         formData.append("file", file);
 
         try {
-            const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000";
+            const API_BASE = import.meta.env.VITE_API_URL || "https://physics-backend.onrender.com";
             const res = await fetch(`${API_BASE}/upload`, {
                 method: "POST",
                 body: formData
@@ -185,7 +185,7 @@ function App() {
         const finalPrompt = systemPrompt + input;
 
         try {
-            const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000";
+            const API_BASE = import.meta.env.VITE_API_URL || "https://physics-backend.onrender.com";
             const result = await fetch(`${API_BASE}/ask`, {
                 method: "POST",
                 headers: {
