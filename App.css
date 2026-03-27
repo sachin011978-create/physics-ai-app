@@ -10,7 +10,8 @@
 
 body {
   margin: 0;
-  background-color: var(--bg-dark);
+  background: radial-gradient(circle at top center, #1a1a2e 0%, var(--bg-dark) 100%);
+  background-attachment: fixed;
   color: var(--text-main);
   font-family: 'Inter', sans-serif;
 }
@@ -683,4 +684,80 @@ body {
   border: none;
   border-radius: 8px;
   background-color: #fff;
+}
+
+/* Touch Targets & Accessibility */
+button, .upload-label, .diff-btn, .game-btn, .back-btn, .quick-action-btn, .send-btn, .sidebar-toggle-btn, .save-note-btn, .concept-pill {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+    padding: 1rem;
+  }
+  
+  .game-columns {
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: center;
+  }
+  
+  .classroom-layout-wb {
+    flex-direction: column;
+    height: auto;
+    min-height: unset;
+    padding: 1rem;
+  }
+  
+  .classroom-sidebar, .whiteboard-area, .classroom-center.right-pdf, .notes-sidebar {
+    width: 100%;
+    min-width: unset;
+  }
+  
+  .classroom-sidebar.compact {
+    width: 100%;
+  }
+
+  .notes-sidebar {
+    right: -100%;
+  }
+  
+  .notes-sidebar.open {
+    right: 0;
+  }
+
+  .chat-area {
+    padding: 1rem;
+  }
+
+  .input-container {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .send-btn {
+    width: 100%;
+    padding: 1rem;
+  }
+  
+  .header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .wb-title {
+    font-size: 1.3rem;
+  }
+  
+  .game-col {
+    width: 100%;
+    max-width: 300px;
+  }
 }
