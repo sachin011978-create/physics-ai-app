@@ -15,7 +15,7 @@ dotenv.config({ path: '../.env' });
 const upload = multer({ dest: 'uploads/' });
 
 const app = express();
-app.use(cors({ origin: '*' }));
+app.use(cors({ origin: '*', methods: ['GET', 'POST'], allowedHeaders: ['Content-Type'] }));
 app.get('/health', (req, res) => res.send('OK'));
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));

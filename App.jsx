@@ -161,7 +161,7 @@ function App() {
                 setMessages(prev => [...prev, { role: 'ai', text: '❌ Failed to upload databank.' }]);
             }
         } catch (err) {
-            console.error(err);
+            console.error("Upload Fetch Error Details:", err.message, err);
             setMessages(prev => [...prev, { role: 'ai', text: '❌ Error connecting to neural network.' }]);
         }
         setUploading(false);
@@ -202,7 +202,7 @@ function App() {
             const data = await result.json();
             setMessages(prev => [...prev, { role: 'ai', text: data.answer }]);
         } catch (error) {
-            console.error("AI Error:", error);
+            console.error("Ask Fetch Error Details:", error.message, error);
             setMessages(prev => [...prev, { role: 'ai', text: "Connection error. Please refresh the mainframe!" }]);
         }
 
