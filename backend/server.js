@@ -13,7 +13,7 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization']
 }));
-app.options('*', cors());
+app.options('/ask', cors());
 app.use(express.json());
 
 // Load Gemini gracefully
