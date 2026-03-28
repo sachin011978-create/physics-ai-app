@@ -21,7 +21,12 @@ if (!fs.existsSync(uploadDir)) {
 const upload = multer({ dest: uploadDir });
 
 const app = express();
-app.use(cors()); // Allow all cross-origin requests
+app.use(cors({
+  origin: '*', // Allows any device (mobile/desktop) to connect
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+app.options('*', cors()); // Handles preflight requests for mobile browsers
 app.get('/health', (req, res) => res.send('OK'));
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
