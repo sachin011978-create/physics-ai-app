@@ -666,25 +666,7 @@ body {
   font-family: 'Inter', sans-serif;
 }
 
-/* PDF Area Reset */
-.classroom-center.right-pdf {
-  flex: 1;
-  min-width: 350px;
-  display: flex;
-  flex-direction: column;
-  background-color: var(--bg-panel);
-  border-radius: 12px;
-  padding: 1rem;
-  border: 1px solid #333;
-}
 
-.pdf-viewer {
-  width: 100%;
-  flex-grow: 1;
-  border: none;
-  border-radius: 8px;
-  background-color: #fff;
-}
 
 /* Touch Targets & Accessibility */
 button, .upload-label, .diff-btn, .game-btn, .back-btn, .quick-action-btn, .send-btn, .sidebar-toggle-btn, .save-note-btn, .concept-pill {

@@ -87,12 +87,9 @@ function DimensionGame({ onExit }) {
 }
 
 function App() {
-    const [messages, setMessages] = useState([{ role: 'ai', text: 'Hello! I am your Cyber-Physics assistant. Upload your databank (PDF) and select a difficulty!' }]);
+    const [messages, setMessages] = useState([{ role: 'ai', text: 'Hello! I am your Cyber-Physics assistant. Select a difficulty and ask me any question!' }]);
     const [input, setInput] = useState('');
-    const [fileUri, setFileUri] = useState('');
-    const [localPdfUrl, setLocalPdfUrl] = useState('/physicsbook.pdf');
     const [loading, setLoading] = useState(false);
-    const [uploading, setUploading] = useState(false);
     const [level, setLevel] = useState('Medium');
     const [showGame, setShowGame] = useState(false);
     const [notes, setNotes] = useState(() => localStorage.getItem('studyNotes') || '');
@@ -138,34 +135,7 @@ function App() {
         localStorage.setItem('appFeedback', feedback);
     }, [rating, feedback]);
 
-    const handleFileUpload = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
 
-        setUploading(true);
-        const formData = new FormData();
-        formData.append("file", file);
-
-        try {
-            const API_BASE = "https://physics-backend.onrender.com";
-            const res = await fetch(`${API_BASE}/upload`, {
-                method: "POST",
-                body: formData
-            });
-            const data = await res.json();
-            if (data.fileUri) {
-                setFileUri(data.fileUri);
-                setLocalPdfUrl(data.localUrl);
-                setMessages(prev => [...prev, { role: 'ai', text: '✅ Neural link established. Physics book securely uploaded!' }]);
-            } else {
-                setMessages(prev => [...prev, { role: 'ai', text: '❌ Failed to upload databank.' }]);
-            }
-        } catch (err) {
-            console.error("Upload Fetch Error Details:", err.message, err);
-            setMessages(prev => [...prev, { role: 'ai', text: '❌ Error connecting to neural network.' }]);
-        }
-        setUploading(false);
-    };
 
     const handleSend = async () => {
         if (!input.trim() || loading) return;
@@ -173,16 +143,18 @@ function App() {
         setMessages(prev => [...prev, { role: 'user', text: input }]);
         setLoading(true);
 
-        let systemPrompt = "";
+        const basePersona = "You are an expert Physics Teacher for a student named Vivan. Explain 11th-12th grade Physics using simple real-life examples, home experiments, and a mix of Marathi and English.";
+        let difficultyInstruction = "";
+        
         if (level === "Easy") {
-            systemPrompt = "System Instruction: Explain the following physics concept like I am 10 years old. Use very simple language, combining easy Marathi and English. Always include relatable, real-life everyday examples. Avoid complex math. \n\nQuestion: ";
+            difficultyInstruction = "Focus on stories and very simple Marathi.";
         } else if (level === "Medium") {
-            systemPrompt = "System Instruction: Answer the following physics question strictly following the 11th Standard Maharashtra Board textbook definitions and syllabus. Provide clear, standard educational explanations. \n\nQuestion: ";
+            difficultyInstruction = "Use standard textbook definitions with examples.";
         } else if (level === "Hard") {
-            systemPrompt = "System Instruction: Provide an advanced, highly detailed explanation for the following. Include rigorous mathematical derivations, formulas, advanced scientific terminology, and deep conceptual theories. \n\nQuestion: ";
+            difficultyInstruction = "Include formulas and numerical hints.";
         }
 
-        const finalPrompt = systemPrompt + input;
+        const finalPrompt = `System Instruction: ${basePersona} ${difficultyInstruction}\n\nQuestion: ${input}`;
 
         try {
             const API_BASE = "https://physics-backend.onrender.com";
@@ -192,10 +164,7 @@ function App() {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    prompt: finalPrompt,
-                    fileUri: fileUri || undefined,
-                    chapterStartPage: activeConcept ? activeConcept.page : 1,
-                    chapterEndPage: activeConcept ? activeConcept.page + 20 : 21
+                    prompt: finalPrompt
                 }),
             });
 
@@ -215,10 +184,6 @@ function App() {
             <header className="header">
                 <h1>⚡ Physics.AI</h1>
                 <div className="header-actions">
-                    <label className="upload-label">
-                        {uploading ? "SYNCING..." : "UPLOAD DATABANK (PDF)"}
-                        <input type="file" accept="application/pdf" className="upload-input" onChange={handleFileUpload} disabled={uploading} />
-                    </label>
                     <button className="sidebar-toggle-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>📝 Notes</button>
                 </div>
             </header>
@@ -311,10 +276,7 @@ function App() {
                         </div>
                     </div>
 
-                    {/* Right: PDF Viewer */}
-                    <div className="classroom-center right-pdf">
-                        <iframe src={`${localPdfUrl}#page=${activeConcept ? activeConcept.page : 1}`} className="pdf-viewer" title="Textbook PDF"></iframe>
-                    </div>
+
                 </div>
             ) : showGame ? (
                 <DimensionGame onExit={() => setShowGame(false)} />
