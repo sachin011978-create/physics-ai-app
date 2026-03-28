@@ -12,10 +12,16 @@ const pdfParse = typeof pdfParseModule === 'function' ? pdfParseModule : (pdfPar
 
 dotenv.config({ path: '../.env' });
 
-const upload = multer({ dest: 'uploads/' });
+// Ensure uploads directory exists for Render production environment
+const uploadDir = 'uploads/';
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const upload = multer({ dest: uploadDir });
 
 const app = express();
-app.use(cors({ origin: '*', methods: ['GET', 'POST'], allowedHeaders: ['Content-Type'] }));
+app.use(cors()); // Allow all cross-origin requests
 app.get('/health', (req, res) => res.send('OK'));
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
