@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './App.css';
 
 const physicsPairs = [
@@ -9,18 +9,16 @@ const physicsPairs = [
     { term: "Area", dim: "[M⁰ L² T⁰]" }
 ];
 
-function DimensionGame({ onExit }) {
+function DimensionGame() {
     const [terms, setTerms] = useState([]);
     const [dims, setDims] = useState([]);
     const [selectedTerm, setSelectedTerm] = useState(null);
-    const [errorMsg, setErrorMsg] = useState("");
     const [matchedPairs, setMatchedPairs] = useState([]);
+    const [errorMsg, setErrorMsg] = useState("");
 
     useEffect(() => {
-        const shuffledTerms = [...physicsPairs].sort(() => Math.random() - 0.5).map(p => p.term);
-        const shuffledDims = [...physicsPairs].sort(() => Math.random() - 0.5).map(p => p.dim);
-        setTerms(shuffledTerms);
-        setDims(shuffledDims);
+        setTerms([...physicsPairs].sort(() => Math.random() - 0.5).map(p => p.term));
+        setDims([...physicsPairs].sort(() => Math.random() - 0.5).map(p => p.dim));
     }, []);
 
     const handleTermClick = (term) => {
@@ -45,137 +43,92 @@ function DimensionGame({ onExit }) {
     };
 
     return (
-        <div className="game-area">
-            <h2 className="game-title">Dimension Matcher</h2>
-            
-            <div className="game-columns">
+        <div className="game-container">
+            <h2 className="section-title">🎮 Dimension Matcher</h2>
+            <div className="game-grid">
                 <div className="game-col">
                     {terms.map(term => (
-                        <button 
-                            key={term}
-                            className={`game-btn ${selectedTerm === term ? 'selected' : ''} ${matchedPairs.includes(term) ? 'matched' : ''}`}
-                            onClick={() => handleTermClick(term)}
-                        >
-                            {term}
-                        </button>
+                        <button key={term} className={`game-btn ${selectedTerm === term ? 'active' : ''} ${matchedPairs.includes(term) ? 'matched' : ''}`} onClick={() => handleTermClick(term)}>{term}</button>
                     ))}
                 </div>
                 <div className="game-col">
                     {dims.map(dim => (
-                        <button 
-                            key={dim}
-                            className={`game-btn ${matchedPairs.includes(dim) ? 'matched' : ''}`}
-                            onClick={() => handleDimClick(dim)}
-                        >
-                            {dim}
-                        </button>
+                        <button key={dim} className={`game-btn dim-btn ${matchedPairs.includes(dim) ? 'matched' : ''}`} onClick={() => handleDimClick(dim)}>{dim}</button>
                     ))}
                 </div>
             </div>
+            {errorMsg && <div className="game-error">{errorMsg}</div>}
+            {matchedPairs.length === physicsPairs.length * 2 && <div className="game-success">🎉 Perfect Match! 🎉</div>}
+        </div>
+    );
+}
 
-            <div className="game-error">{errorMsg}</div>
-            
-            {matchedPairs.length === physicsPairs.length * 2 && (
-                <div className="game-success">
-                    🎉 All Dimensions Matched! 🎉
-                </div>
-            )}
+function ConceptsBoard() {
+    const conceptData = [
+        { chapter: "Units & Measurements", concepts: [{ title: "SI Units", desc: "The standard metric system." }, { title: "Dimensions", desc: "Base quantities of physics." }] },
+        { chapter: "Laws of Motion", concepts: [{ title: "Newton's 1st Law", desc: "Inertia stays constant." }, { title: "Momentum", desc: "Mass × Velocity." }] },
+        { chapter: "Gravitation", concepts: [{ title: "Universal Gravity", desc: "F = G(m1·m2)/r²" }] }
+    ];
 
-            <button className="back-btn" onClick={onExit}>⬅ Back to AI Chat</button>
+    return (
+        <div className="concepts-container">
+            <h2 className="section-title">📚 Concepts Board</h2>
+            <div className="concepts-list">
+                {conceptData.map((ch, i) => (
+                    <div key={i} className="concept-card">
+                        <h3>{ch.chapter}</h3>
+                        {ch.concepts.map((con, j) => (
+                            <div key={j} className="concept-item">
+                                <strong>{con.title}</strong>
+                                <p>{con.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                ))}
+            </div>
         </div>
     );
 }
 
 function App() {
-    const [messages, setMessages] = useState([{ role: 'ai', text: 'Hello! I am your Cyber-Physics assistant. Select a difficulty and ask me any question!' }]);
+    const [messages, setMessages] = useState([{ role: 'ai', text: "Hello Vivan! I'm your Cyber-Physics Teacher. Select a difficulty and ask me anything!" }]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
     const [level, setLevel] = useState('Medium');
-    const [showGame, setShowGame] = useState(false);
-    const [notes, setNotes] = useState(() => localStorage.getItem('studyNotes') || '');
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    
-    const conceptData = [
-        {
-            chapter: "Units and Measurements",
-            concepts: [
-                { id: '1a', title: "SI Units", explanation: "The International System of Units (SI) is the modern metric system used universally in science.", formula: "N/A", example: "Meter (m) for length, Kilogram (kg) for mass.", page: 2 },
-                { id: '1b', title: "Dimensions", explanation: "Dimensions represent the nature of a physical quantity in terms of base quantities.", formula: "[M^a L^b T^c]", example: "Velocity = [M^0 L^1 T^-1]", page: 6 }
-            ]
-        },
-        {
-            chapter: "Laws of Motion",
-            concepts: [
-                { id: '4a', title: "Newton's 1st Law", explanation: "An object remains at rest or in uniform motion unless acted upon by an external force.", formula: "ΣF = 0 => a = 0", example: "A book resting on a table.", page: 48 },
-                { id: '4b', title: "Momentum", explanation: "The product of an object's mass and its velocity.", formula: "p = m × v", example: "A heavy truck moving fast has high momentum.", page: 50 },
-                { id: '4c', title: "Conservation of Momentum", explanation: "In an isolated system, the total momentum remains constant over time.", formula: "m_1 u_1 + m_2 u_2 = m_1 v_1 + m_2 v_2", example: "Recoil of a gun when fired.", page: 55 }
-            ]
-        },
-        {
-            chapter: "Gravitation",
-            concepts: [
-                { id: '5a', title: "Universal Law of Gravitation", explanation: "Every particle attracts every other particle with a force directly proportional to the product of their masses.", formula: "F = G(m1·m2)/r²", example: "The Earth orbiting the Sun.", page: 79 },
-                { id: '5b', title: "Acceleration due to Gravity", explanation: "The acceleration gained by an object due to gravitational force.", formula: "g = GM/R²", example: "Dropping an apple (g ≈ 9.8 m/s²).", page: 82 }
-            ]
-        }
-    ];
+    const [activeTab, setActiveTab] = useState('chat'); // 'chat' | 'concepts' | 'game'
+    const messagesEndRef = useRef(null);
 
-    // Classroom Pedagogy States
-    const [showClassroom, setShowClassroom] = useState(false);
-    const [activeConcept, setActiveConcept] = useState(conceptData[0].concepts[0]);
-    const [rating, setRating] = useState(() => parseInt(localStorage.getItem('appRating') || '0'));
-    const [feedback, setFeedback] = useState(() => localStorage.getItem('appFeedback') || '');
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
 
     useEffect(() => {
-        localStorage.setItem('studyNotes', notes);
-    }, [notes]);
-
-    useEffect(() => {
-        localStorage.setItem('appRating', rating);
-        localStorage.setItem('appFeedback', feedback);
-    }, [rating, feedback]);
-
-
+        scrollToBottom();
+    }, [messages]);
 
     const handleSend = async () => {
         if (!input.trim() || loading) return;
 
         setMessages(prev => [...prev, { role: 'user', text: input }]);
+        const currentInput = input;
+        setInput('');
         setLoading(true);
-
-        const basePersona = "You are an expert Physics Teacher for a student named Vivan. Explain 11th-12th grade Physics using simple real-life examples, home experiments, and a mix of Marathi and English.";
-        let difficultyInstruction = "";
-        
-        if (level === "Easy") {
-            difficultyInstruction = "Focus on stories and very simple Marathi.";
-        } else if (level === "Medium") {
-            difficultyInstruction = "Use standard textbook definitions with examples.";
-        } else if (level === "Hard") {
-            difficultyInstruction = "Include formulas and numerical hints.";
-        }
-
-        const finalPrompt = `System Instruction: ${basePersona} ${difficultyInstruction}\n\nQuestion: ${input}`;
 
         try {
             const API_BASE = "https://physics-backend.onrender.com";
-            const result = await fetch(`${API_BASE}/ask`, {
+            // const API_BASE = "http://localhost:3000"; // For local testing if needed
+            
+            const response = await fetch(`${API_BASE}/ask`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    prompt: finalPrompt
-                }),
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ input: currentInput, level })
             });
 
-            const data = await result.json();
+            const data = await response.json();
             setMessages(prev => [...prev, { role: 'ai', text: data.answer }]);
         } catch (error) {
-            console.error("Ask Fetch Error Details:", error.message, error);
-            setMessages(prev => [...prev, { role: 'ai', text: "Connection error. Please refresh the mainframe!" }]);
+            setMessages(prev => [...prev, { role: 'ai', text: "⚠️ Network Error: Unable to reach the physics mainframe." }]);
         }
-
-        setInput('');
         setLoading(false);
     };
 
@@ -183,152 +136,52 @@ function App() {
         <div className="app-container">
             <header className="header">
                 <h1>⚡ Physics.AI</h1>
-                <div className="header-actions">
-                    <button className="sidebar-toggle-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>📝 Notes</button>
+                <div className="difficulty-pills">
+                    <button className={`diff-pill ${level === 'Easy' ? 'active easy' : ''}`} onClick={() => setLevel('Easy')}>Easy</button>
+                    <button className={`diff-pill ${level === 'Medium' ? 'active medium' : ''}`} onClick={() => setLevel('Medium')}>Medium</button>
+                    <button className={`diff-pill ${level === 'Hard' ? 'active hard' : ''}`} onClick={() => setLevel('Hard')}>Hard</button>
                 </div>
             </header>
 
-            <div className="difficulty-selector">
-                <button 
-                    className={`diff-btn easy ${level === 'Easy' && !showGame && !showClassroom ? 'active' : ''}`}
-                    onClick={() => { setLevel('Easy'); setShowGame(false); setShowClassroom(false); }}>
-                    EASY
-                </button>
-                <button 
-                    className={`diff-btn medium ${level === 'Medium' && !showGame && !showClassroom ? 'active' : ''}`}
-                    onClick={() => { setLevel('Medium'); setShowGame(false); setShowClassroom(false); }}>
-                    MEDIUM
-                </button>
-                <button 
-                    className={`diff-btn hard ${level === 'Hard' && !showGame && !showClassroom ? 'active' : ''}`}
-                    onClick={() => { setLevel('Hard'); setShowGame(false); setShowClassroom(false); }}>
-                    HARD
-                </button>
-                <button 
-                    className={`diff-btn game ${showGame ? 'active' : ''}`}
-                    style={{ borderColor: showGame ? '#ffaa00' : '#444', color: showGame ? '#ffaa00' : '#888', boxShadow: showGame ? '0 0 15px rgba(255, 170, 0, 0.4)' : 'none' }}
-                    onClick={() => { setShowGame(true); setShowClassroom(false); }}>
-                    🎮 PLAY GAME
-                </button>
-                <button 
-                    className={`diff-btn classroom ${showClassroom ? 'active' : ''}`}
-                    style={{ borderColor: showClassroom ? '#00f3ff' : '#444', color: showClassroom ? '#00f3ff' : '#888', boxShadow: showClassroom ? '0 0 15px rgba(0, 243, 255, 0.4)' : 'none' }}
-                    onClick={() => { setShowClassroom(true); setShowGame(false); }}>
-                    🏫 CLASSROOM
-                </button>
-            </div>
+            <main className="main-layout">
+                {/* Desktop: 3-Column Grid. Mobile: Only visible if activeTab matches */}
+                <aside className={`side-panel left ${activeTab === 'concepts' ? 'mobile-visible' : ''}`}>
+                    <ConceptsBoard />
+                </aside>
 
-            {showClassroom ? (
-                <div className="classroom-layout-wb">
-                    {/* Left Sidebar: Concept Cards */}
-                    <div className="classroom-sidebar left compact">
-                        <h3 className="classroom-header">Concept Cards</h3>
-                        <div className="concept-list">
-                            {conceptData.map((ch, idx) => (
-                                <div key={idx} className="concept-card">
-                                    <h4 className="card-title">{ch.chapter}</h4>
-                                    <div className="concept-chips">
-                                        {ch.concepts.map(con => (
-                                            <button 
-                                                key={con.id} 
-                                                className={`concept-pill ${activeConcept?.id === con.id ? 'active' : ''}`}
-                                                onClick={() => setActiveConcept(con)}
-                                            >
-                                                {con.title}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Center: Digital Whiteboard */}
-                    <div className="whiteboard-area">
-                        <div className="whiteboard-board">
-                           <div className="wb-top-bar">
-                                <span className="wb-dot"></span>
-                                <span className="wb-dot"></span>
-                                <span className="wb-dot"></span>
-                           </div>
-                           {activeConcept ? (
-                               <div className="wb-content">
-                                   <h2 className="wb-title">{activeConcept.title}</h2>
-                                   
-                                   <div className="wb-section">
-                                       <h4 className="wb-heading">Explanation</h4>
-                                       <p className="wb-text">{activeConcept.explanation}</p>
-                                   </div>
-
-                                   <div className="wb-section">
-                                       <h4 className="wb-heading">Formula</h4>
-                                       <div className="wb-formula-box">{activeConcept.formula}</div>
-                                   </div>
-
-                                   <div className="wb-section">
-                                       <h4 className="wb-heading">Real-life Example</h4>
-                                       <p className="wb-text">{activeConcept.example}</p>
-                                   </div>
-                               </div>
-                           ) : (
-                               <p className="wb-placeholder">Select a concept to start learning.</p>
-                           )}
-                        </div>
-                    </div>
-
-
-                </div>
-            ) : showGame ? (
-                <DimensionGame onExit={() => setShowGame(false)} />
-            ) : (
-                <>
-                    <div className="chat-area">
+                <section className={`chat-section ${activeTab === 'chat' ? 'mobile-visible' : ''}`}>
+                    <div className="chat-window">
                         {messages.map((m, i) => (
                             <div key={i} className={`message-row ${m.role}`}>
-                                <div className={`message-bubble ${m.role}`}>
-                                    {m.text}
-                                    {m.role === 'ai' && (
-                                        <button className="save-note-btn" onClick={() => setNotes(prev => prev + (prev ? '\n\n' : '') + m.text)}>📌 Save to Notes</button>
-                                    )}
-                                </div>
+                                <div className={`message-bubble ${m.role}`}>{m.text}</div>
                             </div>
                         ))}
-                        {loading && <p className="loading-text">Generating response...</p>}
+                        {loading && <div className="message-row ai"><div className="message-bubble loading">Thinking...</div></div>}
+                        <div ref={messagesEndRef} />
                     </div>
 
                     <div className="input-area">
-                        <div className="quick-actions">
-                            <button className="quick-action-btn" onClick={() => setInput('Please provide a 5-point summary of this chapter.')}>📖 Summarize Chapter</button>
-                            <button className="quick-action-btn" onClick={() => setInput('Please solve this numerical problem step-by-step.')}>🔢 Solve Numerical</button>
-                            <button className="quick-action-btn" onClick={() => setInput('Please explain the key elements of this diagram.')}>🎨 Diagram Guide</button>
-                            <button className="quick-action-btn" onClick={() => setInput('Suggest a simple home experiment to understand this concept.')}>🧪 Home Experiment</button>
-                        </div>
-                        <div className="input-container">
-                            <input
-                                value={input}
-                                onChange={(e) => setInput(e.target.value)}
-                                onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                                className="chat-input"
-                                placeholder="Query the physics mainframe..."
-                            />
-                            <button onClick={handleSend} className="send-btn">SEND</button>
-                        </div>
+                        <input 
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                            placeholder="Ask Vivan's Teacher..."
+                            autoComplete="off"
+                        />
+                        <button onClick={handleSend} disabled={loading || !input.trim()}>SEND</button>
                     </div>
-                </>
-            )}
+                </section>
 
-            <div className={`notes-sidebar ${isSidebarOpen ? 'open' : ''}`}>
-                <div className="notes-header">
-                    <h2>My Notes 📝</h2>
-                    <button className="close-sidebar-btn" onClick={() => setIsSidebarOpen(false)}>❌</button>
-                </div>
-                <textarea 
-                    className="notes-textarea"
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Write your study points here..."
-                ></textarea>
-            </div>
+                <aside className={`side-panel right ${activeTab === 'game' ? 'mobile-visible' : ''}`}>
+                    <DimensionGame />
+                </aside>
+            </main>
+
+            <nav className="mobile-nav">
+                <button className={activeTab === 'concepts' ? 'active' : ''} onClick={() => setActiveTab('concepts')}>📚 Concepts</button>
+                <button className={activeTab === 'chat' ? 'active' : ''} onClick={() => setActiveTab('chat')}>💬 Chat</button>
+                <button className={activeTab === 'game' ? 'active' : ''} onClick={() => setActiveTab('game')}>🎮 Game</button>
+            </nav>
         </div>
     );
 }
